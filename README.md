@@ -1,3 +1,0 @@
-#maths
-# IntroductoryAlgorithms
-# IntroductoryAlgorithms
