@@ -1,0 +1,63 @@
+clf 
+//Morse Potential Using Finite Difference Method
+D=0.755501; // eV 
+a=1.44;//taking the value of alpha; 
+m=940*(10**6);//eV/c**2 
+hc=1973; //ev*A 
+r0=0.131349;//A (Angstrom)
+r= 0.529:0.01:1.52     //Starting from Bohr Radius in Angstrom 
+rd=(r-r0)./r; 
+
+function vol=V(rd)
+    vol=D*(exp(-2*a*rd)-exp(-a*rd)); 
+endfunction
+
+b=0.9135293; 
+a= 0.7517032; 
+n=100; 
+fac=(hc**2)/(2*m); 
+dx = (b-a)/ (n+1);
+term13 = -(1 / dx^2);
+term2 = (2 / dx^2);
+
+xval = zeros(n,1);
+vval = zeros(n,1);
+
+H = zeros(n,n);
+for j = 1:n
+     //Ensure the first entry does not result in an error
+    if j-1>0
+        H(j,j-1) = term13;
+    end
+    
+    //Ensure the last entry does not result in an error
+    if j+1< n+1
+        H(j,j+1) = term13;
+    end
+    
+    //The second term cannot result in an error
+    H(j,j) = term2 + V(a + j*dx);    
+    vval(j) = V(a + j*dx);
+    xval(j) = (a + j * dx);
+end
+
+
+//Get the eigenvectors and eigenvalues of the Schrodinger Matrix
+//E: The Energy (eigenvalues)
+//U: A matrix for which each column is an eigenvector (wavefunction)
+[U,E] = spec(H);
+
+//Normalize each vector
+for m = 1:n
+    U(:,m) = U(:,m) / norm(U(:,m));
+end
+   
+//Take the complex conjugate in order to plot probability density
+P = U.*conj(U);
+
+
+//Plot the first three Probability vectors
+plot(xval,P(:,1),'b');
+plot(xval,P(:,2),'r')
+plot(xval,P(:,3),'g')
+legend('q = 1','q = 2','q = 3')
